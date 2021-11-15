@@ -25,7 +25,7 @@
 
 #define LEDON 0
 #define LEDOFF 1
-#define MQTT_BROKER "192.168.1.100"
+#define MQTT_BROKER "192.168.1.174"
 #define THING_NAME "ThisThing"
 #define LIGHT_LEVEL_TOPIC "mytopic/light"
 #define ANNOUNCE_TOPIC "mytopic/announce"
