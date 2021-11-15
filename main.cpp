@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include <cstring>
 #define MQTTClient_QOS2 1
 
 #include "mbed.h"
@@ -24,7 +25,7 @@
 
 #define LEDON 0
 #define LEDOFF 1
-#define MQTT_BROKER "192.168.1.174"
+#define MQTT_BROKER "192.168.1.100"
 #define THING_NAME "ThisThing"
 #define LIGHT_LEVEL_TOPIC "mytopic/light"
 #define ANNOUNCE_TOPIC "mytopic/announce"
@@ -60,9 +61,12 @@ const char *sec2str(nsapi_security_t sec) {
 }
 void messageArrived(MQTT::MessageData &md) {
   MQTT::Message &message = md.message;
-  uint32_t len = message.payloadlen;
-  (&message.payload)[len] = 0;
-  lthresh = atoi((char *)message.payload);
+  uint32_t len = md.message.payloadlen;
+  //(&md.message.payload)[len-1] = 0;
+  //int i = 0;
+  char rxed[len+1];
+  strncpy(&rxed[0], (char *) (&md.message.payload)[0], len);
+  lthresh = atoi(rxed);
   rxCount++;
   rxLed = !rxLed;
 }
@@ -110,6 +114,12 @@ int main() {
   lightsG = LEDOFF;
   lightsB = LEDOFF;
   printf("WiFi-MQTT example\n");
+  /* Initialise display */
+//  GUI_Init();
+//  GUI_Clear();
+//  GUI_SetFont(GUI_FONT_20B_1);
+//  GUI_DispStringAt("Telemetry Data", 0, 0);
+
 
 #ifdef MBED_MAJOR_VERSION
   printf("Mbed OS version %d.%d.%d\n\n", MBED_MAJOR_VERSION, MBED_MINOR_VERSION,
@@ -206,8 +216,22 @@ int main() {
     message.payloadlen = strlen(buffer) + 1;
 
     //        if (lightDisplay != lastLightDisplay) {
-    lightsR = client.publish(LIGHT_LEVEL_TOPIC, message);
+    rc=client.publish(LIGHT_LEVEL_TOPIC, message);
 
+    if (lightPercent < (lthresh-5)) {
+        lightsR = LEDON;
+        lightsG = LEDOFF;
+        lightsB = LEDOFF;
+    } else if (lightPercent > (lthresh + 5)) {
+        lightsR = LEDOFF;
+        lightsG = LEDOFF;
+        lightsB = LEDON;
+    } else {
+        lightsR = LEDOFF;
+        lightsG = LEDON;
+        lightsB = LEDOFF;
+    }
+    if (rc!=0) printf("publish failed\n");
     if (rxCount != lastRxCount) {
       printf("Current subscribed message received count = %d\n", rxCount);
       printf("lthresh is now = %d\n", lthresh);
