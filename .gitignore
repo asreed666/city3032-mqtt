@@ -3,3 +3,8 @@ BUILD
 mbed-os
 mbed-mqtt
 mbed_app.json
+compile_commands.json
+.clangd
+.cache
+ntp-client
+PinDetect
