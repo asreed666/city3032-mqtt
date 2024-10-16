@@ -20,16 +20,13 @@
 #include "mbed.h"
 #include <MQTTClientMbedOs.h>
 #include <cstdint>
-
+#include "GUI.h"
+#include "cy8ckit_028_tft.h"
 
 
 #define LEDON 0
 #define LEDOFF 1
-#define MQTT_BROKER "192.168.1.176"
-#define THING_NAME "ASR_Thang"
-#define LIGHT_LEVEL_TOPIC "ASR_Thang/light"
-#define ANNOUNCE_TOPIC "mytopic/announce"
-#define LIGHT_THRESH_TOPIC "ASR_Thang/lthresh"
+#include "thing_name.h"
 
 WiFiInterface *wifi;
 
@@ -207,6 +204,17 @@ int main() {
     printf("publish light threshold failed %d\n", rc);
   }
   uint32_t lastRxCount = 0;
+     GUI_Init();
+
+    /* Set font size, foreground and background Colours */
+    GUI_SetFont(GUI_FONT_16B_1);
+    GUI_SetColor(GUI_WHITE);
+    GUI_SetBkColor(GUI_BLACK);
+
+    /* Clear screen and print splash screen */
+    GUI_Clear();
+    GUI_SetTextAlign(GUI_TA_HCENTER);
+    GUI_DispStringAt("CITY3032 MQTT Example", 160, 0);
   while (1) {
 
     statusLed = !statusLed;

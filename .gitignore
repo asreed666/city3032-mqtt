@@ -8,3 +8,4 @@ compile_commands.json
 .cache
 ntp-client
 PinDetect
+middleware-emwin
